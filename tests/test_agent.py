@@ -1,25 +1,21 @@
 import pytest
-from ichatbio.agent_response import DirectResponse, ProcessBeginResponse, ProcessLogResponse, ArtifactResponse, \
-    ResponseMessage
+import pytest_asyncio
+from ichatbio.agent_response import ArtifactResponse
 
-from src.agent import HelloWorldAgent
+from src.agent import BHLAgent
+
+
+@pytest_asyncio.fixture()
+def agent():
+    return BHLAgent()
 
 
 @pytest.mark.asyncio
-async def test_hello_world(context, messages):
-    # The test `context` populates the `messages` list with the agent's responses
-    await HelloWorldAgent().run(context, "Hi", "hello", None)
+async def test_search_bhl(agent, context, messages):
+    await agent.run(context, "Rattus rattus in Colombia", "search_bhl", None)
 
-    # Message objects are restricted to the following types:
-    messages: list[ResponseMessage]
-
-    # We can test all the agent's responses at once
-    assert messages == [
-        ProcessBeginResponse("Thinking"),
-        ProcessLogResponse("Hello world!"),
-        ArtifactResponse(mimetype="text/html",
-                         description="The Wikipedia page for \"Hello World\"",
-                         uris=["https://en.wikipedia.org/wiki/Hello_World"],
-                         metadata={'source': 'Wikipedia'}),
-        DirectResponse("I said it!")
-    ]
+    artifact: ArtifactResponse = next((m for m in messages if type(m) is ArtifactResponse), None)
+    assert artifact
+    assert artifact.mimetype == "application/json"
+    assert "BHL search results" in artifact.description
+    assert artifact.content is not None
