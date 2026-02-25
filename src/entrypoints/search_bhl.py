@@ -141,7 +141,7 @@ class LLMAdvancedSearchParameters(BaseModel):
 
 
 async def _generate_search_parameters(request: str) -> SimplePublicationSearchParameters:
-    model = os.getenv("AGENTS_LLM", "gpt-4.1")
+    model = os.getenv("AGENTS_LLM", "gpt-5.2")
     try:
         client: AsyncInstructor = instructor.from_openai(AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY")))
         p = await client.chat.completions.create(
