@@ -1,6 +1,6 @@
 # ichatbio-bhl-agent
 
-An agent for accessing BHL
+An agent for accessing BHL.
 
 ## Quickstart
 
