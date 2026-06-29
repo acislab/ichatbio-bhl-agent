@@ -12,7 +12,7 @@ from openai import AsyncOpenAI
 from pydantic import Field, BaseModel, model_validator
 from tenacity import AsyncRetrying
 
-from util import AIGenerationException, StopOnTerminalErrorOrMaxAttempts
+from util import AIGenerationException, StopOnTerminalErrorOrMaxAttempts, get_llm_client_kwargs
 from schema import PublicationSearchResponse, AdvancedPublicationSearchParameters, SimplePublicationSearchParameters
 
 # This description helps iChatBio understand when to call this entrypoint
@@ -141,9 +141,9 @@ class LLMAdvancedSearchParameters(BaseModel):
 
 
 async def _generate_search_parameters(request: str) -> SimplePublicationSearchParameters:
-    model = os.getenv("AGENTS_LLM", "gpt-5.2")
+    model = os.getenv("LLM", os.getenv("AGENTS_LLM", "gpt-5.2"))
     try:
-        client: AsyncInstructor = instructor.from_openai(AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY")))
+        client: AsyncInstructor = instructor.from_openai(AsyncOpenAI(**get_llm_client_kwargs()))
         p = await client.chat.completions.create(
             model=model,
             temperature=0,
@@ -168,9 +168,9 @@ async def _generate_search_parameters(request: str) -> SimplePublicationSearchPa
 
 
 async def _generate_advanced_search_parameters(request: str) -> AdvancedPublicationSearchParameters:
-    model = os.getenv("AGENTS_LLM", "gpt-4.1")
+    model = os.getenv("LLM", os.getenv("AGENTS_LLM", "gpt-4.1"))
     try:
-        client: AsyncInstructor = instructor.from_openai(AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY")))
+        client: AsyncInstructor = instructor.from_openai(AsyncOpenAI(**get_llm_client_kwargs()))
         p = await client.chat.completions.create(
             model=model,
             temperature=0,
