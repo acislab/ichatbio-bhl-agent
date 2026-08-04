@@ -9,7 +9,7 @@ from pydantic import BaseModel
 from starlette.applications import Starlette
 
 from entrypoints import search_bhl
-from util import update_llm_credentials
+from util import set_llm_credentials
 
 
 class BHLAgent(IChatBioAgent):
@@ -38,7 +38,7 @@ class BHLAgent(IChatBioAgent):
         params: Optional[BaseModel],
         metadata: dict[str, Any] | None = None,
     ):
-        update_llm_credentials(metadata)
+        set_llm_credentials(metadata)
         match entrypoint:
             case search_bhl.entrypoint.id:
                 await search_bhl.run(context, request)
